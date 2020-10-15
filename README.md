@@ -20,7 +20,7 @@ $ source ~/.virtualenvs/ansible/bin/activate
 ```bash
 (ansible) $ git clone https://github.com/ol-eg/ansible.git && cd ansible
 (ansible) $ git config credential.helper store
-(ansible) $ for role_name in o.bash-cfg ; do
+(ansible) $ for role_name in o.sys-upgrade o.bash-cfg o.molecule; do
 (ansible) > ansible-galaxy install git+https://github.com/ol-eg/${role_name}.git
 (ansible) > done
 ```

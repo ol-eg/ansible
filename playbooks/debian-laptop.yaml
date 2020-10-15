@@ -3,3 +3,4 @@
   roles:
     - o.sys-upgrade
     - o.bash-cfg
+    - o.molecule
