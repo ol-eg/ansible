@@ -22,7 +22,7 @@ ssh public key needs to be uploaded to git hub via web-frontend (settings -> SSH
 
 ```bash
 (ansible) $ git clone git@github.com:ol-eg/ansible.git && cd ansible
-(ansible) $ for role in o.sys-upgrade o.bash-cfg o.docker o.molecule; do
+(ansible) $ for role in sys_upgrade bash_cfg virtualbox vagrant docker molecule; do
 (ansible) > ansible-galaxy install git+git@github.com:ol-eg/${role}.git
 (ansible) > done
 ```

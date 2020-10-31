@@ -1,7 +1,0 @@
-- hosts: localhost
-  become: yes
-  roles:
-    - o.sys-upgrade
-    - o.bash-cfg
-    - { role: o.docker, docker_users: [ansible,mort] }
-    - o.molecule
