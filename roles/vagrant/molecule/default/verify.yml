@@ -1,0 +1,16 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+  - name: Get vagrant version.
+    command: vagrant --version
+    register: ver
+    changed_when: False
+
+  - name: Verify vagrant version.
+    assert:
+      that:
+        - ver.rc == 0
+        - '"Vagrant 2" in ver.stdout'
+...

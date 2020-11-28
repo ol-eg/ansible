@@ -1,0 +1,6 @@
+---
+- name: Install vagrant from the offical deb repo.
+  apt:
+    name: vagrant
+    update_cache: yes
+...
