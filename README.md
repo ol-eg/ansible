@@ -20,9 +20,12 @@ $ source ~/.virtualenvs/ansible/bin/activate
 
 ssh public key needs to be uploaded to git hub via web-frontend (settings -> SSH and GPG keys)
 
-tbd.
+```(ansible) $ ansible-galaxy collection install git@github.com:ol-eg/ansible.git```
 
 ### Play examples.
+
 ```
+$ cp -v ~/.ansible/collections/ansible_collections/oppa/all/ansible.cfg ~/.ansible.cfg
+$ cp -v ~/.ansible/collections/ansible_collections/oppa/all/hosts ~/hosts
 (ansible) $ ansible-playbook ~/ansible/playbooks/debian-laptop.yaml
 ```

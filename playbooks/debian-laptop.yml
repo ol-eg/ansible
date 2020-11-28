@@ -6,5 +6,9 @@
 - hosts: localhost
   become: yes
   roles:
-    # Let's first install tools to develop and test ansible roles.
-    - vagrant
+    - sys_upgrade
+    # Tools to develop and test ansible roles.
+    # Bootstraps docker, virtualbox, and vagrant.
+    - molecule
+    - bash_cfg
+    - vim

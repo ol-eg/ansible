@@ -4,7 +4,7 @@ version: "0.0.1"
 readme: "README.md"
 authors:
     - "oleg <o-le-g@inbox.ru"
-descriptions: "Collection of roles and modules to provision physical machines."
-licence:
+description: "Collection of roles and modules to provision physical machines."
+license:
     - "MIT"
 repository: "https://github.com/ol-eg/ansible"
