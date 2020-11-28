@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include sys_upgrade"
+      include_role:
+        name: "sys_upgrade"

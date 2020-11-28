@@ -1,0 +1,26 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+  - include_vars: ../../defaults/main.yml
+
+  - name: Fetch os description.
+    command: lsb_release -ds
+    register: os_desc
+    changed_when: False # never report changed
+
+  - name: Verify os is debian buster.
+    assert:
+      that: os_desc.stdout == "Debian GNU/Linux 10 (buster)"
+
+  - name: Collect all apt sources
+    shell: cat /etc/apt/sources.list.d/*
+    register: apt_sources
+    changed_when: False
+
+  - name: Verify debian contrib/non-free repos are in.
+    assert:
+      that: '"{{ item }} contrib non-free" in apt_sources.stdout'
+    loop: "{{ deb_contrib_nonfree_repos }}"
+...

@@ -1,0 +1,19 @@
+---
+- name: Add Debian contrib and non-free repos
+  apt_repository:
+    repo: "{{ item }} contrib non-free"
+    state: present
+  loop: "{{ deb_contrib_nonfree_repos }}"
+
+- name: Upgrade the system
+  apt:
+    upgrade: safe
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Remove useless packages from the cache
+  apt: autoclean=yes
+
+- name: Remove dependancies that are no longer required
+  apt: autoremove=yes
+...
