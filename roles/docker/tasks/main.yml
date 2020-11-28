@@ -1,0 +1,60 @@
+---
+- name: Uninstall older versions of Docker
+  apt:
+    name:
+      - docker
+      - docker-engine
+      - docker.io
+      - containerd
+      - runc
+    state: absent
+
+- name: Install packages to allow apt to use a repo over https
+  apt:
+    name:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg-utils
+        - software-properties-common
+    state: present
+    update_cache: yes
+
+- name: Add Docker's official gpg key
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+
+- name: Set up Docker stable repo
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/debian buster stable
+    state: present
+
+- name: Install Docker
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: present
+    update_cache: yes
+
+- name: Make sure there's docker group
+  group:
+    name: docker
+    state: present
+
+- name: Add users to the docker group
+  user:
+    name: "{{ item }}"
+    groups:
+        - docker
+        - sudo
+  with_items: "{{ docker_users }}"
+
+- name: Маке sure docker starts on boot
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+...

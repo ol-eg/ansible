@@ -1,0 +1,15 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  become: yes
+  tasks:
+  - name: Run docker hello-world.
+    command: docker run --rm hello-world
+    register: hw
+    changed_when: False
+
+  - name: Verify docker hello-world was successful.
+    assert:
+      that: '"Hello from Docker!" in hw.stdout'
+...

@@ -1,0 +1,4 @@
+- hosts: localhost
+  become: yes
+  roles:
+    - { role: docker, docker_users: [ansible,mort] }
