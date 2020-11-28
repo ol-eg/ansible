@@ -1,0 +1,6 @@
+---
+user: ansible
+home: "{{ lookup('env', 'HOME') }}"
+venv_dir: .virtualenvs
+venv_name: ansible
+...

@@ -1,0 +1,18 @@
+---
+- name: Install libssl-dev, pyvenv.
+  apt:
+    pkg:
+      - libssl-dev
+      - python3-venv
+    update_cache: yes
+
+- name: Install molecule
+  become_user: "{{ user }}"
+  pip:
+    name:
+      - molecule[docker,lint]
+      - molecule-vagrant
+      - python-vagrant
+    virtualenv: "{{ home }}/{{ venv_dir }}/{{ venv_name }}"
+    virtualenv_command: pyvenv
+...
