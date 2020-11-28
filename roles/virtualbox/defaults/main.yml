@@ -1,0 +1,6 @@
+apt_src_lst_dir: /etc/apt/sources.list.d
+vb:
+  apt_src_lst_name: virtualbox
+  src_entry: "deb http://download.virtualbox.org/virtualbox/debian buster contrib"
+  pgp_url: https://www.virtualbox.org/download/oracle_vbox_2016.asc
+  pkg_name: virtualbox-6.0  # latest supported by vagrant at the time of Oct-2020

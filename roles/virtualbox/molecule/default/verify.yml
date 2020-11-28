@@ -1,0 +1,39 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+  - include_vars: ../../defaults/main.yml
+
+  - name: Stat /etc/apt/sources.list.d/virtualbox.list
+    stat:
+      path: "{{ apt_src_lst_dir }}/{{ vb.apt_src_lst_name }}.list"
+    register: vbox
+
+  - name: Verify virtualbox.list file
+    assert:
+      that: |
+        vbox.stat.path == "{{ apt_src_lst_dir }}/{{ vb.apt_src_lst_name }}.list" and
+        vbox.stat.mode == "0644" and vbox.stat.pw_name == "root" and
+        vbox.stat.gr_name == "root" and vbox.stat.size > 0
+
+  - name: Read virtualbox.list
+    command: "cat {{ apt_src_lst_dir }}/{{ vb.apt_src_lst_name }}.list"
+    register: vbox
+    changed_when: False # never report the changed
+
+  - name: Verify we have the right string in virtualbox.list
+    assert:
+      that: vbox.stdout == "{{ vb.src_entry }}"
+
+  - name: Stat Virtualbox install dir.
+    stat:
+      path: /usr/lib/virtualbox
+    register: vbdir
+
+  - name: Verify virtualbox install dir exists.
+    assert:
+      that: |
+        vbdir.stat.mode == "0755" and vbdir.stat.pw_name == "root" and
+        vbdir.stat.gr_name == "root" and vbdir.stat.isdir
+...

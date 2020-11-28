@@ -1,6 +1,6 @@
 # ansible
 
-## install (debian host assumed)
+## Install (debian host assumed).
 *create ansible user, add it to the sudo group and make sudo passwordless*
 ```bash
 # adduser ansible
@@ -16,17 +16,13 @@ $ source ~/.virtualenvs/ansible/bin/activate
 (ansible) $ pip install --upgrade pip setuptools wheel
 (ansible) $ pip install ansible
 ```
-### install playbooks and private roles
+### Install collection from this repo.
 
 ssh public key needs to be uploaded to git hub via web-frontend (settings -> SSH and GPG keys)
 
-```bash
-(ansible) $ git clone git@github.com:ol-eg/ansible.git && cd ansible
-(ansible) $ for role in sys_upgrade bash_cfg virtualbox vagrant docker molecule; do
-(ansible) > ansible-galaxy install git+git@github.com:ol-eg/${role}.git
-(ansible) > done
+tbd.
+
+### Play examples.
 ```
-### play
-```
-(ansible) $ ansible-playbook playbooks/debian-laptop.yaml
+(ansible) $ ansible-playbook ~/ansible/playbooks/debian-laptop.yaml
 ```

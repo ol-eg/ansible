@@ -1,0 +1,21 @@
+---
+- name: Install PGP utils.
+  apt:
+    name: gnupg-utils
+    update_cache: yes
+
+- name: Add Oracle Virtualbox public key.
+  apt_key:
+    url: "{{ vb.pgp_url }}"
+
+- name: Add Oracle Virtualbox repo.
+  apt_repository:
+    repo: "{{ vb.src_entry }}"
+    filename: "{{ vb.apt_src_lst_name }}"
+    state: present
+
+- name: Install Virtualbox.
+  apt:
+    name: "{{ vb.pkg_name }}"
+    update_cache: yes
+...

@@ -1,14 +1,10 @@
 # This is not meant to be rock-solid installation procedure.
 # (I ain't good enough with Debian, ansible etc for this).
 # For me the major benefit here is the documentation as code.
+# This is meant to be played straight after manual OS install,
+# while host is still hooked up to the internet with the wire.
 - hosts: localhost
   become: yes
   roles:
-    - sys_upgrade
-# Let's first install tools to develop and test ansible roles.
+    # Let's first install tools to develop and test ansible roles.
     - vagrant
-    - { role: docker, docker_users: [ansible,mort] }
-    - molecule
-# Some conviniences
-    - bash_cfg
-# todo: vim
