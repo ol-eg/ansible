@@ -1,0 +1,11 @@
+---
+patterns:
+  - '^"\s*let g:skip_defaults_vim = 1\s*$'
+  - '^"\sset showcmd\s'
+  - '^"\sset showmatch\s'
+
+lines:
+  - 'let g:skip_defaults_vim = 1'
+  - 'set showcmd    "Show (partial) command in status line.'
+  - 'set showmatch  "Show matching brackets.'
+...

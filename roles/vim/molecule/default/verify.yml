@@ -1,0 +1,30 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+  - name: Get vim version.
+    command: vim --version
+    register: ver
+    changed_when: False
+
+  - name: Verify vim version.
+    assert:
+      that:
+        - ver.rc == 0
+        - '"VIM - Vi IMproved 8" in ver.stdout'
+
+  - name: Stat /etc/vim/vimrc.local
+    stat:
+      path: /etc/vim/vimrc.local
+    register: vimrc_local
+
+  - name: Verify vimrc.local has been created.
+    assert:
+      that:
+        - vimrc_local.stat.exists
+        - vimrc_local.stat.size > 0
+        - vimrc_local.stat.pw_name == 'root'
+        - vimrc_local.stat.gr_name == 'root'
+        - vimrc_local.stat.mode == '0644'
+...

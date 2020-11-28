@@ -1,0 +1,15 @@
+filetype off
+let python_highlight_all = 1
+set autoindent
+set encoding=utf-8
+set expandtab
+set fileformat=unix
+set hlsearch
+set listchars=tab:¬¬,eol:¶
+set list
+set nocompatible
+set number
+set shiftwidth=4    " Indents
+set softtabstop=4
+set tabstop=4       " Still it is a \t
+syntax enable

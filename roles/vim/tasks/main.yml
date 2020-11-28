@@ -1,0 +1,26 @@
+---
+- name: Install vim from the official deb repo.
+  apt:
+    name: vim
+    update_cache: yes
+
+- name: Make default systemwide config.
+  lineinfile:
+    path: /etc/vim/vimrc
+    regexp: "{{ item.0 }}"
+    line: "{{ item.1 }}"
+  loop: "{{ patterns|zip(lines)|list }}"
+
+- name: Create vimrc.local
+  copy:
+    src: vimrc.local
+    dest: /etc/vim/vimrc.local
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Set vim to be global editor.
+  community.general.alternatives:
+    name: editor
+    path: /usr/bin/vim.basic
+...
