@@ -1,0 +1,24 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+  - include_vars: ../../defaults/main.yml
+
+  - name: Collect source files stats
+    stat:
+      path: "/etc/profile.d/{{ item }}.sh"
+    register: sourced
+    loop: "{{ files2source }}"
+
+  - name: Verify source files have been installed
+    assert:
+      that: |
+        sourced.results[{{ i }}].stat.path == "/etc/profile.d/{{ item }}.sh" and
+        sourced.results[{{ i }}].stat.mode == "0644" and
+        sourced.results[{{ i }}].stat.pw_name == "root" and
+        sourced.results[{{ i }}].stat.gr_name == "root" and
+        sourced.results[{{ i }}].stat.size > 0
+    loop: "{{ files2source }}"
+    loop_control:
+      index_var: i

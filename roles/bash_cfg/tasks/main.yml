@@ -1,0 +1,9 @@
+---
+- name: Install shell source files.
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/profile.d/{{ item }}.sh"
+    mode: 0644
+    backup: yes
+  loop: "{{ files2source }}"
+...
