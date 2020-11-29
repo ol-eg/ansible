@@ -1,6 +1,25 @@
 ---
+os_prerequisites:
+  - ansible-doc
+  - libssl-dev
+  - python3-venv
+py_prerequisites:
+    - molecule[docker,lint]
+    - molecule-vagrant
+    - pytest
+    - pytest-cov
+    - python-vagrant
 user: ansible
 home: "{{ lookup('env', 'HOME') }}"
 venv_dir: .virtualenvs
 venv_name: ansible
+py_verify:
+    - ansible-lint
+    - molecule
+    - molecule-docker
+    - molecule-vagrant
+    - pytest
+    - pytest-cov
+    - python-vagrant
+    - yamllint
 ...

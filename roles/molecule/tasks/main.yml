@@ -1,18 +1,15 @@
 ---
-- name: Install libssl-dev, pyvenv.
+- name: Install OS prerequisites.
   apt:
-    pkg:
-      - libssl-dev
-      - python3-venv
+    name: "{{ item }}"
     update_cache: yes
+  loop: "{{ os_prerequisites }}"
 
 - name: Install molecule
   become_user: "{{ user }}"
   pip:
-    name:
-      - molecule[docker,lint]
-      - molecule-vagrant
-      - python-vagrant
+    name: "{{ item }}"
     virtualenv: "{{ home }}/{{ venv_dir }}/{{ venv_name }}"
     virtualenv_command: pyvenv
+  loop: "{{ py_prerequisites }}"
 ...

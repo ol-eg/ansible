@@ -6,17 +6,12 @@
   - include_vars: ../../defaults/main.yml
 
   - name: Read installed python packages.
-    shell: ". {{ home }}/{{ venv_dir }}/{{ venv_name }}/bin/activate; pip freeze"
+    shell: ". /root/{{ venv_dir }}/{{ venv_name }}/bin/activate; pip freeze"
     register: freeze
     changed_when: False
 
   - name: Verify molecule is installed.
     assert:
-      that:
-        - '"ansible-lint==" in freeze.stdout'
-        - '"molecule==" in freeze.stdout'
-        - '"molecule-docker==" in freeze.stdout'
-        - '"molecule-vagrant==" in freeze.stdout'
-        - '"python-vagrant==" in freeze.stdout'
-        - '"yamllint==" in freeze.stdout'
+      that: '"{{ item }}==" in freeze.stdout'
+    loop: "{{ py_verify }}"
 ...

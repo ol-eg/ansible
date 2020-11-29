@@ -1,4 +1,5 @@
 *.bkp
 *.retry
 *.swp
-test.yaml
+htmlcov
+__pycache__
