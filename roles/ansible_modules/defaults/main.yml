@@ -1,0 +1,12 @@
+---
+prerequisites:
+  - build-essential
+  - libssl-dev
+  - libffi-dev
+  - python3-dev
+  - python3-setuptools
+  - python3-setuptools-git
+user: ansible
+home: "{{ lookup('env', 'HOME') }}"
+ansible_repo_dir: ansible-dev
+...

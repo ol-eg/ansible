@@ -1,0 +1,23 @@
+---
+- name: Install prerequisites.
+  apt:
+    name:
+      - "{{ item }}"
+    state: present
+    update_cache: yes
+  loop: "{{ prerequisites }}"
+
+- name: Clone official Ansible repository.
+  become_user: "{{ user }}"
+  git:
+    repo: https://github.com/ansible/ansible.git
+    dest: "{{ home }}/{{ ansible_repo_dir }}"
+
+- name: Good luck message.
+  debug:
+    msg:
+      - "To start development:"
+      - "$ source ~/.virtualenvs/ansible/bin/activate"
+      - "$ cd ~/ansible-dev"
+      - "$ source hacking/env-setup"
+...

@@ -1,0 +1,10 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include ansible_modules"
+      include_role:
+        name: "ansible_modules"
+      vars:
+        user: root
+        home: "/root"

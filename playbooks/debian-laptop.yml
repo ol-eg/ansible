@@ -7,8 +7,9 @@
   become: yes
   roles:
     - sys_upgrade
-    # Tools to develop and test ansible roles.
+    # Tools to develop and test ansible roles, modules.
     # Bootstraps docker, virtualbox, and vagrant.
+    - ansible_modules
     - molecule
     - bash_cfg
     - vim
