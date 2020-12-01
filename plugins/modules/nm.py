@@ -50,18 +50,45 @@ message:
 '''
 from ansible.module_utils.basic import AnsibleModule
 
-def set_defaults(params):
+valid = set([
+    (None, None, None),
+    ('nmcli', None, None),
+    ('nmcli', 'networking', None),
+    ('nmcli', 'networking', 'off'),
+    ('nmcli', 'networking', 'on'),
+])
+
+
+def validate(module: AnsibleModule, result: dict):
+    params = (
+        module.params.get('name'),
+        module.params.get('object'),
+        module.params.get('state')
+    )
+    if params not in valid:
+        result['message'] =  'Invalid parameters choice.'
+        module.fail_json(msg='Failed', **result)
+
+
+def set_defaults(params: dict):
+    # this is naive and only works until we implement only nmcli.networking
     keys = ['name', 'object']
     defaults = ['nmcli', 'networking']
     for key, default in zip(keys, defaults):
         if not params.get(key):
             params[key] = default
 
+
+class nmcli:
+    def networking(self, state: str):
+        return  True, True, 'All good'
+
+
 def run_module():
     module_args = dict(
-        name =dict(type='str', required=False),
+        name=dict(type='str', required=False),
         object=dict(type='str', required=False),
-        state =dict(type='str', required=False),
+        state=dict(type='str', required=False),
     )
     result = dict(
         changed=False,
@@ -75,11 +102,13 @@ def run_module():
     if module.check_mode:
         module.exit_json(**result)
 
-    set_defaults(module.params)
     result['original_message'] = f'{module.params}'
-    result['message'] = 'tbd'
-    changed = False
-    failed = False
+    validate(module, result)
+    set_defaults(module.params)
+    print(module.params)
+    util = eval(module.params['name'])()
+    func = getattr(util, module.params.get('object', 'networking'))
+    failed, changed, result['message'] = func(module.params.get('state'))
 
     if changed:
         result['changed'] = True
