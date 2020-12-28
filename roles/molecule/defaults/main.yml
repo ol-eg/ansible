@@ -8,6 +8,7 @@ py_prerequisites:
     - molecule-vagrant
     - pytest
     - pytest-cov
+    - pytest-flake8
     - python-vagrant
 user: ansible
 home: "{{ lookup('env', 'HOME') }}"
@@ -20,6 +21,7 @@ py_verify:
     - molecule-vagrant
     - pytest
     - pytest-cov
+    - pytest-flake8
     - python-vagrant
     - yamllint
 ...
