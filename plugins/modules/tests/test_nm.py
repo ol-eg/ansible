@@ -22,6 +22,22 @@ def test_validate_valid():
         module.fail_json.assert_not_called()
 
 
+def test_validate_connect():
+    module = create_autospec(AnsibleModule)
+    module.params = dict(
+        connect=dict(ssid='wifi-test', password='password', ifname='wlp58s0')
+    )
+    assert nm.validate_connect(module)
+
+
+def test_invalidate_connect():
+    module = create_autospec(AnsibleModule)
+    module.params = dict(
+        connect=dict(ssid='wifi-test', password='password')
+    )
+    assert not nm.validate_connect(module)
+
+
 def test_validate_invalid():
     module = create_autospec(AnsibleModule)
     module.params = dict(name='foobar')
@@ -107,7 +123,7 @@ def test_on_off_failed_to_change():
 def test_networking(monkeypatch):
     mock = MagicMock()
     monkeypatch.setattr(nm.nmcli, '_on_off', mock)
-    nm.nmcli().networking('on')
+    nm.nmcli().networking(state='on')
     mock.assert_called_once_with(
         ['nmcli', 'networking'],
         'on',
@@ -118,12 +134,55 @@ def test_networking(monkeypatch):
 def test_wifi(monkeypatch):
     mock = MagicMock()
     monkeypatch.setattr(nm.nmcli, '_on_off', mock)
-    nm.nmcli().wifi('on')
+    nm.nmcli().wifi(state='on')
     mock.assert_called_once_with(
         ['nmcli', 'radio', 'wifi'],
         'on',
         'nmcli radio wifi {} exit code: {:d}, {}: {}',
     )
+
+
+def test_wifi_fail2connect():
+    failed, changed, msg = nm.nmcli().wifi(
+        connect=dict(ssid='test', password='test', ifname='test')
+    )
+    assert failed
+    assert not changed
+    assert 'stderr: Error:' in msg
+
+
+def test_wifi_already_connected(monkeypatch):
+    mock = MagicMock(return_value=(0, 'GENERAL.STATE:100 (connected)'))
+    monkeypatch.setattr(nm.nmcli, '_run_command', mock)
+    failed, changed, msg = nm.nmcli().wifi(
+        connect=dict(ssid='test', password='test', ifname='test')
+    )
+    mock.assert_called_once_with(['nmcli', '-t', 'device', 'show', 'test'])
+    assert not failed
+    assert not changed
+    assert 'already connected' in msg
+
+
+def test_wifi_connect_ok(monkeypatch):
+    mock = MagicMock(side_effect=[
+        (0, 'GENERAL.STATE:30 (disconnected)'),
+        (0, 'successfully activated'),
+    ])
+    monkeypatch.setattr(nm.nmcli, '_run_command', mock)
+    failed, changed, msg = nm.nmcli().wifi(
+        connect=dict(ssid='test', password='test', ifname='test')
+    )
+    assert not failed
+    assert changed
+    assert f'successfully activated' in msg
+    assert len(mock.mock_calls) == 2
+    name, args, kwargs = mock.mock_calls[0]
+    assert args == (['nmcli', '-t', 'device', 'show', 'test'],)
+    name, args, kwargs = mock.mock_calls[1]
+    assert args == ([
+        'nmcli', '-t', 'device', 'wifi', 'connect', 'test',
+        'password', 'test', 'ifname', 'test'
+    ],)
 
 
 def test_main(monkeypatch):

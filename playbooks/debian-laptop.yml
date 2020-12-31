@@ -8,8 +8,9 @@
   roles:
     - sys_upgrade
     # Tools to develop and test ansible roles, modules.
-    # Bootstraps docker, virtualbox, and vagrant.
     - ansible_modules
+    # molecule will install docker, vagrant
+    # vagrant will install virtualbox
     - molecule
     - bash_cfg
     - vim

@@ -1,15 +1,146 @@
-filetype off
+" from https://realpython.com/vim-and-python-a-match-made-in-heaven/
+set nocompatible    " required
+filetype off        " required
+
+" set the runtime path to include and initialize Vundle
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+" let Vundle manage Vundle, required
+Plugin 'gmarik/Vundle.vim'
+" add plugins here
+Plugin 'tmhedberg/SimpylFold'
+Plugin 'vim-scripts/indentpython.vim'
+Plugin 'davidhalter/jedi-vim'
+Plugin 'ervandew/supertab'
+Plugin 'jmcantrell/vim-virtualenv'
+Plugin 'vim-syntastic/syntastic'
+Plugin 'nvie/vim-flake8'
+Plugin 'jnurmine/Zenburn'
+Plugin 'preservim/nerdtree'
+Plugin 'preservim/nerdcommenter'
+Plugin 'jistr/vim-nerdtree-tabs'
+" below two should be in this order
+Plugin 'Xuyuanp/nerdtree-git-plugin'
+Plugin 'ryanoasis/vim-devicons'
+" end of order
+Plugin 'tiagofumo/vim-nerdtree-syntax-highlight'
+Plugin 'kien/ctrlp.vim'
+Plugin 'tpope/vim-fugitive'
+Plugin 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}
+Plugin 'airblade/vim-gitgutter'
+Plugin 'yegappan/taglist'
+Plugin 'frazrepo/vim-rainbow'
+Plugin 'NLKNguyen/papercolor-theme'
+Plugin 'flazz/vim-colorschemes'
+Plugin 'jiangmiao/auto-pairs'
+Plugin 'terryma/vim-multiple-cursors'
+" all plugins must be added before the following line
+call vundle#end()            " required
+filetype plugin indent on    " required
+
+" spliting
+set splitbelow
+set splitright
+nnoremap <C-j> <C-W><C-j>
+nnoremap <C-k> <C-W><C-k>
+nnoremap <C-l> <C-W><C-l>
+nnoremap <C-h> <C-W><C-h>
+" end of spliting
+
+" folding
+set foldmethod=indent
+set foldlevel=99
+nnoremap <space> za
+" see docstrings for folded code
+let g:SimpylFold_docstring_preview=1
+" end of folding
+
+" identation
+" PEP 8
+au BufNewFile,BufRead *.py
+    \ set tabstop=4 |
+    \ set softtabstop=4 |
+    \ set shiftwidth=4 |
+    \ set textwidth=79 |
+    \ set expandtab |
+    \ set autoindent |
+    \ set fileformat=unix
+" short indent
+au BufNewFile,BufRead *.js,*.html,*.xml,*.css,*.yml
+    \ set tabstop=2 |
+    \ set softtabstop=2 |
+    \ set shiftwidth=2
+" end of identation
+
+" flag unnecessary whitespace
+" this will highlight all issues including whitespace
 let python_highlight_all = 1
-set autoindent
-set encoding=utf-8
-set expandtab
-set fileformat=unix
-set hlsearch
-set listchars=tab:¬¬,eol:¶
+" let also make tabs and eol visible
 set list
-set nocompatible
+set listchars=tab:¬¬,eol:¶
+" end of flag unnecessary whitespace
+
+" utf-8 support
+set encoding=utf-8
+
+" syntax
+syntax on
+
+" color scheme
+" from 'Learning the vi and Vim Editors' by Arnold Robins, Elbert Hannab
+" and Linda Lamb
+" progressively check higher values... falls out on first true
+" addition of zero ... guarantees return from func is numeric
+" global colors_name is set by colorscheme cmd
+" but until it executes first time it is not defined
+let g:colors_name = "default"
+let g:Favcolorschemes = ["Monokai", "morning", "zenburn", "PaperColor"]
+function SetColors()
+  " currentHour will be 0, 1, 2, or 3
+  let g:CurrentHour = (strftime("%H") + 0) / 6
+  if g:colors_name !~ g:Favcolorschemes[g:CurrentHour]
+    execute "colorscheme " . g:Favcolorschemes[g:CurrentHour]
+    redraw
+  endif
+endfunction
+call SetColors()
+autocmd WinEnter * call SetColors()
+" end of setting colorscheme
+" check file type
+augroup newFileDetection
+autocmd CursorMovedI * call CheckFileType()
+augroup END
+function CheckFileType()
+  if exists("b:countCheck") == 0
+    let b:countCheck = 0
+  endif
+  let b:countCheck += 1
+  " Don't start detecting untill approx. 20 chars,
+  " and give up after approx. 200 chars.
+  if &filetype == "" && b:countCheck > 20 && b:countCheck < 200
+    filetype detect
+  elseif b:countCheck >= 200 || &filetype != ""
+    " If we've exceeded the count threshold (200), OR a filetype
+    " has been detected delete the autocmd!
+    autocmd! newFileDetection
+  endif
+endfunction
+" end of check file type
+
+" misc
+set digraph
+set filetype=on
+set foldcolumn=3
+set mouse=a
 set number
-set shiftwidth=4    " Indents
-set softtabstop=4
-set tabstop=4       " Still it is a \t
-syntax enable
+
+" ignore files in NERDTree
+let NERDTreeIgnore=['\.pyc$', '\~$', '__init__.py', '__pycache__']
+
+" auto start nerdtree
+" autocmd VimEnter * NERDTree
+" or toggle
+nnoremap <F4> :NERDTreeToggle<CR>
+
+" rainbow braces
+let g:rainbow_active = 1

@@ -1,26 +1,69 @@
 ---
-- name: Install vim from the official deb repo.
+- name: Install vim-nox, vim-python-jedi, universal-ctags.
   apt:
-    name: vim
+    name:
+      - "{{ item }}"
     update_cache: yes
+  loop: "{{ prerequisites }}"
 
 - name: Make default systemwide config.
   lineinfile:
-    path: /etc/vim/vimrc
+    path: "{{ sys_vimrc }}"
     regexp: "{{ item.0 }}"
     line: "{{ item.1 }}"
   loop: "{{ patterns|zip(lines)|list }}"
 
-- name: Create vimrc.local
+- name: Create dir for nerd fonts.
+  file:
+    path: "{{ sys_font_dir }}/nerd"
+    state: directory
+    mode: '0755'
+
+- name: Install nerd fonts systemwide.
+  copy:
+    src: "{{ item }}"
+    dest: "{{ sys_font_dir }}/nerd/{{ item }}"
+    mode: '0644'
+  loop: "{{ fonts }}"
+
+- name: Make sure ~/.vim/bundle/Vundle.vim dir exists for target users.
+  file:
+    path: "{{ homedir_prefix }}/{{ item }}/{{ vundle_dir }}"
+    state: directory
+    mode: '0755'
+    recurse: yes
+    owner: "{{ item }}"
+    group: "{{ item }}"
+  loop: "{{ users }}"
+
+- name: Install Vundle for target users.
+  git:
+    repo: "{{ vundle_repo_url }}"
+    dest: "{{ homedir_prefix }}/{{ item }}/{{ vundle_dir }}"
+    version: "{{ vundle_version }}"
+  loop: "{{ users }}"
+
+- name: Create .vimrc files for target users.
   copy:
     src: vimrc.local
-    dest: /etc/vim/vimrc.local
-    owner: root
-    group: root
+    dest: "{{ homedir_prefix }}/{{ item }}/.vimrc"
+    owner: "{{ item }}"
+    group: "{{ item }}"
     mode: '0644'
+  loop: "{{ users }}"
 
 - name: Set vim to be global editor.
   community.general.alternatives:
     name: editor
-    path: /usr/bin/vim.basic
+    path: /usr/bin/vim
+
+- name: Good luck message.
+  debug:
+    msg:
+      - "Before it looks good"
+      - "Update fonst cache: $ sudo fc-cache"
+      - "Choose nerd fonts in terminal preferences"
+      - "Start vim and download all plugins"
+      - ":PluginInstall"
+      - "restart vim and enjoy"
 ...

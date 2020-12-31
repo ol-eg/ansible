@@ -3,7 +3,7 @@
 Unit Tests
 ----------
 
-```(ansible) $ pytest --cov=. [--cov-report=html]```
+```(ansible) $ pytest [--cov=. --flake8 --cov-report=html]```
 
 Check DocStrings
 ----------------

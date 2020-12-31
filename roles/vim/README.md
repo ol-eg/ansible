@@ -1,8 +1,16 @@
 vim
 ===
 
-Install or upgrade vim, create global vimrc,
-configure vim to be default editor systemwide.
+Install or upgrade vim-nox.
+Configure vim to be default editor systemwide.
+For the target user configure vim for python.
+
+todo:
+- install vim-nox, vim-python-jedi
+- install Vundle
+- compile python oriented vimrc
+- for plugnin vim-devicons, install nerd fonts and you need choose this font in terminal preferences
+- for plugin taglist, install universal-ctags
 
 Requirements
 ------------
@@ -15,7 +23,7 @@ Example Playbook
     - hosts: localhost
       become: yes
       roles:
-        - vim
+        - { role: vim, users: [ansible,scrat] }
 
 To Test
 -------

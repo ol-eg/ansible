@@ -5,3 +5,6 @@
     - name: "Include vim"
       include_role:
         name: "vim"
+      vars:
+        users: [root]
+        homedir_prefix: ""

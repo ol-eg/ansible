@@ -3,28 +3,86 @@
   hosts: all
   gather_facts: false
   tasks:
+  - include_vars: ../../defaults/main.yml
+
   - name: Get vim version.
     command: vim --version
     register: ver
-    changed_when: False
+    changed_when: false
 
   - name: Verify vim version.
     assert:
       that:
         - ver.rc == 0
         - '"VIM - Vi IMproved 8" in ver.stdout'
+        - '"+python3" in ver.stdout'
 
-  - name: Stat /etc/vim/vimrc.local
-    stat:
-      path: /etc/vim/vimrc.local
-    register: vimrc_local
+  - name: Read installed packages list.
+    command: apt list --installed
+    register: installed
+    changed_when: false
 
-  - name: Verify vimrc.local has been created.
+  - name: Verify prerequisites are installed.
+    assert:
+      that: '"{{ item }}" in installed.stdout'
+    loop: "{{ prerequisites }}"
+
+  - name: Read systemwide vim config.
+    command: "cat {{ sys_vimrc }}"
+    register: sys_vimrc
+    changed_when: false
+
+  - name: Verify systemwide config.
     assert:
       that:
-        - vimrc_local.stat.exists
-        - vimrc_local.stat.size > 0
-        - vimrc_local.stat.pw_name == 'root'
-        - vimrc_local.stat.gr_name == 'root'
-        - vimrc_local.stat.mode == '0644'
+        - '"skip_defaults_vim = 1" in sys_vimrc.stdout'
+        - '"set showcmd" in sys_vimrc.stdout'
+        - '"set showmatch" in sys_vimrc.stdout'
+
+  - name: Stat nerd font files.
+    stat:
+      path: "{{ sys_font_dir }}/nerd/{{ item }}"
+    loop: "{{ fonts }}"
+    register: font_files
+
+  - name: Verify nerd fonts are installed.
+    assert:
+      that: "{{ item }}.stat.exists"
+    loop: "{{ font_files.results }}"
+
+  - name: Stat Vundle README.md files.
+    stat:
+      path: "/root/{{ vundle_dir }}/README.md"
+    register: vundle_readme
+
+  - name: Verify Vundle is installed for target user.
+    assert:
+      that: vundle_readme.stat.exists
+
+  - name: Stat target user vimrc files.
+    stat:
+      path: "/root/.vimrc"
+    register: user_vimrc
+
+  - name: Verify target users vimrc have been created.
+    assert:
+      that: user_vimrc.stat.exists
+
+  - name: Stat /usr/bin/editor.
+    stat:
+      path: /usr/bin/editor
+    register: editor
+
+  - name: Stat /etc/alternatives/editor.
+    stat:
+      path: /etc/alternatives/editor
+    register: alt_editor
+
+  - name: Verify vim is the global editor.
+    assert:
+      that:
+        - editor.stat.exists
+        - editor.stat.islnk
+        - editor.stat.lnk_source == "/usr/bin/vim.nox"
+        - editor.stat.lnk_target == "/etc/alternatives/editor"
 ...

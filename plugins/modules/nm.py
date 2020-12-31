@@ -34,7 +34,10 @@ options:
     type: str
   connect:
     description: |
-        Write me...
+        Create a new connection and then activate it on a wifi device.
+        It is supposed that IP config is via dhcp.
+        Keys: ssid, password, ifname
+        Only wifi connect is implemented.
     requred: false
     type: dict
 author: oleg (@ol-eg)
@@ -119,15 +122,46 @@ class nmcli:
                 result.format(state, rc, 'stdout', state_after)
             )
 
-    def networking(self, state=None) -> tuple:
+    def networking(self, **kwargs) -> tuple:
         result = 'nmcli networking {} exit code: {:d}, {}: {}'
         with_args = nmcli.cmd + [nmcli.objects[0]]
-        return self._on_off(with_args, state, result)
+        return self._on_off(with_args, kwargs['state'], result)
 
-    def wifi(self, state=None) -> tuple:
+    def wifi(self, **kwargs) -> tuple:
         result = 'nmcli radio wifi {} exit code: {:d}, {}: {}'
         with_args = nmcli.cmd + ['radio', nmcli.objects[1]]
-        return self._on_off(with_args, state, result)
+        if kwargs.get('state'):
+            return self._on_off(with_args, kwargs['state'], result)
+        elif kwargs.get('connect'):
+            return self.wifi_connect(result, **kwargs['connect'])
+        else:
+            return True, False, result.format(
+                '', -1000, 'stderr', 'Not implemented wifi command.')
+
+    def wifi_connect(
+        self, result: str, ssid=None, password=None, ifname=None
+    ) -> tuple:
+        # let's see if wifi is connected
+        rc, msg = self._run_command(nmcli.cmd + ['-t', 'device', 'show', ifname])
+        if rc:
+            return True, False, result.format('connect', rc, 'stderr', msg)
+        state = [
+            s for s in msg.split('\n') if s.startswith('GENERAL.STATE')
+        ][0].split(':')[-1]
+        if state.startswith('100'):
+            return False, False, result.format(
+                'connect', rc, 'stdout', f'{ifname} is already connected'
+            )
+        # let's try to connect
+        args = [
+            '-t', 'device', 'wifi', 'connect',
+            ssid, 'password', password, 'ifname', ifname
+        ]
+        rc, msg = self._run_command(nmcli.cmd + args)
+        if rc:
+            return True, False, result.format('connect', rc, 'stderr', msg)
+        else:
+            return False, True, result.format('connect', rc, 'stdout', msg)
 
 
 def validate(module: AnsibleModule, result: dict):
@@ -136,18 +170,22 @@ def validate(module: AnsibleModule, result: dict):
         module.params.get('object'),
         module.params.get('state')
     )
-    if params not in valid:
+    if params not in valid or not validate_connect(module):
         result['message'] = 'Invalid parameters choice.'
         module.fail_json(msg='Failed', **result)
 
 
+def validate_connect(module: AnsibleModule) -> bool:
+    if module.params.get('connect'):
+        for key in ('ssid', 'password', 'ifname'):
+            if not key in module.params['connect'].keys():
+                return False
+    return True
+
+
 def set_defaults(params: dict):
-    # this is naive and only works until we implement only nmcli.networking
-    keys = ['name', 'object']
-    defaults = ['nmcli', 'networking']
-    for key, default in zip(keys, defaults):
-        if not params.get(key):
-            params[key] = default
+    params['name'] = params.get('name', 'nmcli')
+    params['object'] = params.get('object', 'networking')
 
 
 def run_module():
@@ -155,6 +193,7 @@ def run_module():
         name=dict(type='str', required=False),
         object=dict(type='str', required=False),
         state=dict(type='str', required=False),
+        connect=dict(type=dict, required=None)
     )
     result = dict(
         changed=False,
@@ -174,7 +213,8 @@ def run_module():
     print(module.params['name'])
     util = eval(module.params['name'])()
     func = getattr(util, module.params['object'])
-    failed, changed, result['message'] = func(module.params.get('state'))
+    # failed, changed, result['message'] = func(module.params.get('state'))
+    failed, changed, result['message'] = func(module.params)
 
     if changed:
         result['changed'] = True

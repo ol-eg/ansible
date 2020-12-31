@@ -1,11 +1,27 @@
 ---
-patterns:
-  - '^"\s*let g:skip_defaults_vim = 1\s*$'
-  - '^"\sset showcmd\s'
-  - '^"\sset showmatch\s'
-
+fonts:
+  - Space_Mono_Bold_Italic_Nerd_Font_Complete.ttf
+  - Space_Mono_Bold_Nerd_Font_Complete.ttf
+  - Space_Mono_Italic_Nerd_Font_Complete.ttf
+  - Space_Mono_Nerd_Font_Complete.ttf
+homedir_prefix: /home
 lines:
   - 'let g:skip_defaults_vim = 1'
   - 'set showcmd    "Show (partial) command in status line.'
   - 'set showmatch  "Show matching brackets.'
+patterns:
+  - '^"\s*let g:skip_defaults_vim = 1\s*$'
+  - '^"\sset showcmd\s'
+  - '^"\sset showmatch\s'
+prerequisites:
+  - vim-nox
+  - vim-python-jedi
+  - universal-ctags
+sys_font_dir: /usr/share/fonts
+sys_vimrc: /etc/vim/vimrc
+users:
+  - ansible
+vundle_dir: ".vim/bundle/Vundle.vim"
+vundle_repo_url: https://github.com/gmarik/Vundle.vim.git
+vundle_version: v0.10
 ...
