@@ -72,6 +72,11 @@ au BufNewFile,BufRead *.js,*.html,*.xml,*.css,*.yml
     \ set shiftwidth=2
 " end of identation
 
+" utf-8 support
+set encoding=utf-8
+" it is good idea to set utf-8 before using utf chars
+" like in listchars
+
 " flag unnecessary whitespace
 " this will highlight all issues including whitespace
 let python_highlight_all = 1
@@ -79,9 +84,6 @@ let python_highlight_all = 1
 set list
 set listchars=tab:¬¬,eol:¶
 " end of flag unnecessary whitespace
-
-" utf-8 support
-set encoding=utf-8
 
 " syntax
 syntax on
