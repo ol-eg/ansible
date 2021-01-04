@@ -40,7 +40,7 @@
   git:
     repo: "{{ vundle_repo_url }}"
     dest: "{{ homedir_prefix }}/{{ item }}/{{ vundle_dir }}"
-    version: "{{ vundle_version }}"
+    force: yes
   loop: "{{ users }}"
 
 - name: Create .vimrc files for target users.

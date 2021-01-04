@@ -1,3 +1,4 @@
 # .ansible-lint
 skip_list:  # or 'skip_list' to silence them completely
+  - '401'   # Git checkouts must contain explicit version
   - '502'   # All tasks should be named
