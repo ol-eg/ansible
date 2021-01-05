@@ -6,6 +6,7 @@ os_prerequisites:
 py_prerequisites:
     - molecule[docker,lint]
     - molecule-vagrant
+    - mypy
     - pytest
     - pytest-cov
     - pytest-flake8
@@ -19,6 +20,7 @@ py_verify:
     - molecule
     - molecule-docker
     - molecule-vagrant
+    - mypy
     - pytest
     - pytest-cov
     - pytest-flake8
