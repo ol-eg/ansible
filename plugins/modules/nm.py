@@ -1,68 +1,96 @@
 #!/usr/bin/python3
-from ansible.module_utils.basic import AnsibleModule
-import subprocess
+from ansible.module_utils.basic import AnsibleModule  # type: ignore
+from typing import Dict, List, Tuple, Union
 
 DOCUMENTATION = r'''
 ---
 module: nm
-short_description: Some network config delivered using GNU Network Manager.
+short_description: Network config using GNU Network Manager.
 version_added: "0.0.1"
-description: |
-    Some network config delivered using GNU Network Manager.
-    Why not to use command module? Mainly for better idempotency control.
+description: Network config using GNU Network Manager.
 options:
-  name:
-    description: |
-        NM utility which provides the functionality.
-        Partially implemented: nmcli.
-    default: nmcli
-    required: false
-    type: str
-  object:
-    description: |
-        Object which NM utility is to operate upon.
-        For example if NM utility is nmcli this would be nmcli objects.
-        Partially implemented: nmcli objects - networking, wifi
-    default: networking
-    required: false
-  state:
-    description: |
-        Desired state. Actual value will depend on NM utility and its object.
-        name: nmcli, object: networking, state: ['', on, off].
-        name: nmcli, object: wifi, state: ['', on, off].
-    required: false
-    type: str
-  connect:
-    description: |
-        Create a new connection and then activate it on a wifi device.
-        It is supposed that IP config is via dhcp.
-        Keys: ssid, password, ifname
-        Only wifi connect is implemented.
-    requred: false
-    type: dict
+    name:
+        description: |
+            NM utility name.
+            Partially implemented -- nmcli.
+        required: true
+        type: str
+    object:
+        description: |
+            Object which NM utility is to operate upon.
+            e.g. NM utility 'nmcli' objects: 'networking', 'wifi'.
+            Partially implemented -- nmcli objects:
+            networking, wifi.
+        default: networking (if name is nmcli)
+        required: false
+        type: str
+    state:
+        description: |
+            Desired state. Context dependant. Implemented --
+            name: nmcli, object: networking, state: [None, on, off]
+            name: nmcli, object: wifi, state: [None, on, off]
+        requred: false
+        type: str
+    connect:
+        description: |
+            Create new connection and activate it on a wifi device.
+            It is assumed that IP config is via dhcp.
+            Keys: ssid, password, ifname.
+            Only wifi connect is implemented.
+        required: false
+        type: dict
 author: oleg (@ol-eg)
 ...
-'''
+'''  # type: str
 EXAMPLES = r'''
-- name: Enable networking control by NM.
-  oppa.all.nm:
-    name: nmcli
-    object: networking
-    state: enabled
-'''
+---
+- hosts: localhost
+  become: yes
+  vars_prompt:
+    - name: password
+      prompt: wifi password?
+  tasks:
+    - name: Enable networking control by NM.
+      oppa.all.nm:
+        name: nmcli
+        object: networking
+        state: "on"
+    - name: Enable wifi.
+      oppa.all.nm:
+        name: nmcli
+        object: wifi
+        state: "on"
+    - name: Connect to wifi network.
+      oppa.all.nm:
+        name: nmcli
+        object: wifi
+        connect:
+          ssid: Tinco116_5G
+          password: '{{ password }}'
+          ifname: wlp58s0
+      no_log: true
+...
+'''  # type: str
 RETURN = r'''
+---
 original_message:
-  description: Parameters that were passed in.
-  returned: always
-  sample: 'name: nmcli, object: networking, state: enabled'
+    description: Parameters that were passed in.
+    type: str
+    returned: always
+    sample: "'{''name'': ''nmcli'', ''object'': ''networking''}"
 message:
-  description: The output message that this module generates.
-  type: str
-  returned: always
-  sample: 'nmcli networking exit code: 0, stdout: enabled'
-'''
-valid = set([
-    (None, None, None),
+    description: The module's output message.
+    type: str
+    returned: always
+    sample: 'nmcli networking, exit code: 0, stdout: enabled'
+...
+'''  # type: str
+
+Result = Dict[str, Union[str, bool]]
+Utils = Union['nmcli', ]
+
+VALID = set([
+    ('nmcli', None),
     ('nmcli', None, None),
     ('nmcli', 'networking', None),
     ('nmcli', 'networking', 'off'),
@@ -71,163 +99,128 @@ valid = set([
     ('nmcli', 'wifi', 'off'),
     ('nmcli', 'wifi', 'on'),
 ])
-CMD_TIMEOUT = 180
 
 
 class nmcli:
-    cmd = ['nmcli']
-    objects = ('networking', 'wifi')
-
-    def _run_command(self, cmd: list) -> tuple:
-        proc = None
-        try:
-            proc = subprocess.Popen(
-                cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                universal_newlines=True, bufsize=1,
-            )
-            out, err = proc.communicate(timeout=CMD_TIMEOUT)
-        except OSError as e:
-            out, err = ('', str(e))
-        except subprocess.TimeoutExpired as e:
-            proc.kill()
-            out, err = proc.communicate()
-            err += str(e)
-
-        return getattr(proc, 'returncode', -9999), out + err
-
-    def _on_off(self, with_args: list, state, result: str):
+    def _on_off(
+        self, args: List[str], result: str, module: AnsibleModule,
+    ) -> Tuple[bool, bool, str]:
         # grab current state
-        rc, state_before = self._run_command(with_args)
-        if rc:
-            return True, False, result.format('', rc, 'stderr', state_before)
-
-        if state:
-            with_args += [state]
-
-        dontrun = (
+        rc, state_before, stderr = module.run_command(
+            args, check_rc=True,
+        )
+        state = module.params.get('state')
+        donotrun = (
             not state,
             state == 'on' and state_before.startswith('enabled'),
             state == 'off' and state_before.startswith('disabled'),
         )
-        if any(dontrun):
-            return False, False, result.format('', rc, 'stdout', state_before)
-
-        rc, state_after = self._run_command(with_args)
-        if rc:
-            return True, False, result.format(state, rc, 'stderr', state_after)
-        else:
+        if any(donotrun):
             return (
-                False,
-                state_before != state_after,
-                result.format(state, rc, 'stdout', state_after)
+                False, False,
+                result.format('', rc, 'stdout', state_before)
             )
+        rc, state_after, stderr = module.run_command(
+                args + [state], check_rc=True,
+        )
+        return (
+            False, state_before != state_after,
+            result.format(state, rc, 'stdout', state_after),
+        )
 
-    def networking(self, **kwargs) -> tuple:
-        result = 'nmcli networking {} exit code: {:d}, {}: {}'
-        with_args = nmcli.cmd + [nmcli.objects[0]]
-        return self._on_off(with_args, kwargs['state'], result)
+    def networking(
+            self, module: AnsibleModule
+    ) -> Tuple[bool, bool, str]:
+        result = 'nmcli networking {}, exit code: {:d}, {}: {}'
+        return self._on_off(
+            ['nmcli', 'networking'], result, module,
+        )
 
-    def wifi(self, **kwargs) -> tuple:
-        result = 'nmcli radio wifi {} exit code: {:d}, {}: {}'
-        with_args = nmcli.cmd + ['radio', nmcli.objects[1]]
-        if kwargs.get('state'):
-            return self._on_off(with_args, kwargs['state'], result)
-        elif kwargs.get('connect'):
-            return self.wifi_connect(result, **kwargs['connect'])
+    def wifi(self, module: AnsibleModule) -> Tuple[bool, bool, str]:
+        result = 'nmcli radio wifi {}, exit code: {:d}, {}: {}'
+        if module.params.get('state'):
+            return self._on_off(
+                ['nmcli', 'radio', 'wifi'], result, module,
+            )
+        elif module.params.get('connect'):
+            return self.wifi_connect(result, module)
         else:
             return True, False, result.format(
-                '', -1000, 'stderr', 'Not implemented wifi command.')
+                '', -1000, 'stderr', 'Not implemented wifi command')
 
     def wifi_connect(
-        self, result: str, ssid=None, password=None, ifname=None
-    ) -> tuple:
+        self, result: str, module: AnsibleModule
+    ) -> Tuple[bool, bool, str]:
+        conn = module.params.get('connect')
         # let's see if wifi is connected
-        rc, msg = self._run_command(nmcli.cmd + ['-t', 'device', 'show', ifname])
-        if rc:
-            return True, False, result.format('connect', rc, 'stderr', msg)
+        rc, stdout, stderr = module.run_command(
+            ['nmcli', '-t', 'device', 'show', conn['ifname']],
+            check_rc=True
+        )
         state = [
-            s for s in msg.split('\n') if s.startswith('GENERAL.STATE')
+            s for s in stdout.split('\n') if s.startswith('GENERAL.STATE')
         ][0].split(':')[-1]
         if state.startswith('100'):
             return False, False, result.format(
-                'connect', rc, 'stdout', f'{ifname} is already connected'
-            )
+                'connect', rc,
+                'stdout', f'{conn["ifname"]} already connected')
         # let's try to connect
         args = [
-            '-t', 'device', 'wifi', 'connect',
-            ssid, 'password', password, 'ifname', ifname
+            'nmcli', '-t', 'device', 'wifi', 'connect',
+            conn['ssid'], 'password', conn['password'],
+            'ifname', conn['ifname'],
         ]
-        rc, msg = self._run_command(nmcli.cmd + args)
-        if rc:
-            return True, False, result.format('connect', rc, 'stderr', msg)
-        else:
-            return False, True, result.format('connect', rc, 'stdout', msg)
+        rc, stdout, stderr = module.run_command(args, check_rc=True)
+        return False, True, result.format('connect', rc, 'stdout', stdout)
 
 
-def validate(module: AnsibleModule, result: dict):
+def validate(module: AnsibleModule, result: Result) -> None:
     params = (
         module.params.get('name'),
         module.params.get('object'),
-        module.params.get('state')
+        module.params.get('state'),
     )
-    if params not in valid or not validate_connect(module):
-        result['message'] = 'Invalid parameters choice.'
+    if params not in VALID or not validate_connect(module):
+        result['message'] = 'Invalid parameters choice'
         module.fail_json(msg='Failed', **result)
 
 
 def validate_connect(module: AnsibleModule) -> bool:
     if module.params.get('connect'):
+        keys = module.params['connect'].keys()
         for key in ('ssid', 'password', 'ifname'):
-            if not key in module.params['connect'].keys():
+            if key not in keys:
                 return False
     return True
 
 
-def set_defaults(params: dict):
-    params['name'] = params.get('name', 'nmcli')
-    params['object'] = params.get('object', 'networking')
+def set_defaults(params: Dict[str, str]) -> None:
+    if params['name'] == 'nmcli':
+        if not params.get('object'):
+            params['object'] = 'networking'
 
 
-def run_module():
+def run_module() -> None:
     module_args = dict(
-        name=dict(type='str', required=False),
+        name=dict(type='str', required=True),
         object=dict(type='str', required=False),
         state=dict(type='str', required=False),
-        connect=dict(type=dict, required=None)
+        connect=dict(type=dict, required=False)
     )
-    result = dict(
-        changed=False,
-        original_message='',
-        message='',
+    module = AnsibleModule(argument_spec=module_args)
+    result: Result = dict(
+        changed=False, original_message='', message=''
     )
-    module = AnsibleModule(
-        argument_spec=module_args,
-        supports_check_mode=True,
-    )
-    if module.check_mode:
-        module.exit_json(**result)
-
     result['original_message'] = f'{module.params}'
     validate(module, result)
     set_defaults(module.params)
-    print(module.params['name'])
-    util = eval(module.params['name'])()
-    func = getattr(util, module.params['object'])
-    # failed, changed, result['message'] = func(module.params.get('state'))
-    failed, changed, result['message'] = func(module.params)
-
-    if changed:
-        result['changed'] = True
-
+    util: Utils = eval(module.params['name'])()
+    f = getattr(util, module.params['object'])
+    failed, result['changed'], result['message'] = f(module)
     if failed:
         module.fail_json(msg='Failed', **result)
-
     module.exit_json(**result)
 
 
-def main():
-    run_module()
-
-
 if __name__ == '__main__':
-    main()
+    run_module()
