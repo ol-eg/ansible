@@ -1,0 +1,11 @@
+---
+ifname: wlp58s0
+ifupdown_msg: |
+  Check out '/etc/network/interaces'.
+  This is used to configure ifupdown.
+  If anything is configured there and it is
+  desired to be managed with NetworkManager instead,
+  remove the config from '/etc/network/interfaces'.
+nm_package: network-manager
+ssid: Tinco116_5G
+...

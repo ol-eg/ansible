@@ -23,7 +23,7 @@ Example Playbook
 
     - hosts: servers
       roles:
-         - { role: o.molecule, user: rico }
+         - { role: molecule, user: rico }
 
 To Test
 -------

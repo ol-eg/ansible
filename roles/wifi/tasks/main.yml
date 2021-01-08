@@ -1,0 +1,34 @@
+---
+- name: Install GNU Network Manager package.
+  apt:
+    name:
+      - '{{ nm_package }}'
+    state: present
+    update_cache: yes
+
+- name: Print possible info about interfaces.
+  debug:
+    msg: "{{ ifupdown_msg.split('\n') | list }}"
+
+- name: Enable networking control by NM.
+  oppa.all.nm:
+    name: nmcli
+    object: networking
+    state: "on"
+
+- name: Enable WIFI.
+  oppa.all.nm:
+    name: nmcli
+    object: wifi
+    state: "on"
+
+- name: Connect to wifi network.
+  oppa.all.nm:
+    name: nmcli
+    object: wifi
+    connect:
+      ssid: '{{ ssid }}'
+      password: '{{ password }}'
+      ifname: '{{ ifname }}'
+  no_log: true
+...

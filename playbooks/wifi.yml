@@ -1,0 +1,8 @@
+- hosts: localhost
+  become: yes
+  vars_prompt:
+    - name: wifi_password
+      prompt: wifi password?
+      private: yes
+  roles:
+    - { role: wifi, password: '{{ wifi_password }}' }

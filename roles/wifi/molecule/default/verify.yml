@@ -1,0 +1,34 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+  - include_vars: ../../defaults/main.yml
+
+  - name: Read installed packages list.
+    command: apt list --installed
+    register: installed
+    changed_when: false
+
+  - name: Verify Network Manager has been installed.
+    assert:
+      that: '"{{ nm_package }}" in installed.stdout'
+
+  - name: Collect NM status.
+    command: nmcli networking
+    register: nm_net
+    changed_when: false
+
+  - name: Verify NM is enabled.
+    assert:
+      that: '"enabled" in nm_net.stdout'
+
+  - name: Collect wifi status.
+    command: nmcli radio wifi
+    register: wifi
+    changed_when: false
+
+  - name: Verify WIFI is enabled.
+    assert:
+      that: '"enabled" in wifi.stdout'
+...
