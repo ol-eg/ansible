@@ -25,7 +25,7 @@ ssh public key needs to be uploaded to git hub via web-frontend (settings -> SSH
 ### Play examples.
 
 ```
-$ ln -v ~/.ansible/collections/ansible_collections/oppa/all/ansible.cfg ~/.ansible.cfg
+$ ln -v ~/.ansible/collections/ansible_collections/oppa/all/ansible.cfg ~/ansible.cfg
 $ ln -v ~/.ansible/collections/ansible_collections/oppa/all/hosts ~/hosts
 # provision new laptop after freshly instatlled debian
 (ansible) $ ansible-playbook ~/ansible/playbooks/debian-laptop.yaml

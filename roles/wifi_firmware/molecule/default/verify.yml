@@ -1,0 +1,16 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+  - include_vars: ../../defaults/main.yml
+
+  - name: Read installed packages list.
+    command: apt list --installed
+    register: installed
+    changed_when: false
+
+  - name: Verify firmware has been installed.
+    assert:
+      that: '"{{ firmware }}" in installed.stdout'
+...

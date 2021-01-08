@@ -1,0 +1,11 @@
+---
+- name: Install wifi firmware.
+  apt:
+    name: 
+      - '{{ firmware }}'
+    state: present
+    update_cache: yes
+
+- name: Reboot message.
+  debug: msg="It is good idea to reboot now, before playing wifi role."
+...
