@@ -15,7 +15,7 @@
       that: '"{{ item }}/stable," in installed.stdout'
     loop: "{{ prerequisites }}"
 
-  - name: Stat ~/<user>/Mail directory.
+  - name: Stat ~/Mail directory.
     stat:
       path: "/root/Mail"
     register: maildir
@@ -35,4 +35,17 @@
   - name: Verify sys admin mail is redirected to <user>.
     assert:
       that: '"root: root" in aliases_conf.stdout'
+
+  - name: Stat ~/.muttrc.
+    stat:
+      path: "/root/.muttrc"
+    register: mutt_conf
+
+  - name: Verify user mutt config exists.
+    assert:
+      that:
+        - mutt_conf.stat.pw_name == "root"
+        - mutt_conf.stat.gr_name == "root"
+        - mutt_conf.stat.mode == '0644'
+        - mutt_conf.stat.size > 0
 ...

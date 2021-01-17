@@ -1,0 +1,15 @@
+set folder="$HOME/Mail"
+set record="+sent"
+set mbox="+mbox"
+set postponed="+postponed"
+set abort_nosubject=ask-yes
+set abort_unmodified=ask-yes
+unset askbcc
+set copy=ask-yes
+set delete=yes
+set edit_headers
+set editor="vi"
+set mark_old
+set move=ask-yes
+set postpone=ask-yes
+set recall=ask-yes
