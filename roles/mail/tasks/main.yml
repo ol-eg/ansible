@@ -1,0 +1,26 @@
+---
+- name: Install mutt.
+  apt:
+    name:
+      - "{{ item }}"
+    update_cache: yes
+  loop: "{{ prerequisites }}"
+
+- name: Make sure ~/<user>/Mail exists.
+  file:
+    path: "{{ homedir_prefix }}/{{ user }}/Mail"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: '0700'
+
+- name: Make sure root's mail is redierected to <user>.
+  lineinfile:
+    path: "{{ aliases }}"
+    regexp: "^root: {{ user }}$"
+    line: "root: {{user}}"
+    create: yes
+    group: root
+    owner: root
+    mode: '644'
+...

@@ -14,3 +14,4 @@
     - molecule
     - bash_cfg
     - vim
+    - mail

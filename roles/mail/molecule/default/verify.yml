@@ -1,0 +1,38 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+  - include_vars: ../../defaults/main.yml
+
+  - name: Read installed packages list.
+    command: apt list --installed
+    register: installed
+    changed_when: false
+
+  - name: Verify mail software is installed.
+    assert:
+      that: '"{{ item }}/stable," in installed.stdout'
+    loop: "{{ prerequisites }}"
+
+  - name: Stat ~/<user>/Mail directory.
+    stat:
+      path: "/root/Mail"
+    register: maildir
+
+  - name: Verify target user has Mail directory.
+    assert:
+      that:
+        - maildir.stat.pw_name == "root"
+        - maildir.stat.gr_name == "root"
+        - maildir.stat.mode == "0700"
+
+  - name: Read /etc/aliases.
+    command: "cat {{ aliases }}"
+    register: aliases_conf
+    changed_when: false
+
+  - name: Verify sys admin mail is redirected to <user>.
+    assert:
+      that: '"root: root" in aliases_conf.stdout'
+...

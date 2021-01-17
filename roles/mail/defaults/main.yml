@@ -1,0 +1,7 @@
+---
+aliases: /etc/aliases
+homedir_prefix: /home
+prerequisites:
+  - mutt
+user: mort
+...

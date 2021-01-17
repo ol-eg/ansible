@@ -1,0 +1,46 @@
+---
+dependency:
+  name: galaxy
+
+driver:
+  name: docker
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+  flake8
+
+platforms:
+  - name: tst-deb-mail
+    image: docker.io/pycontribs/debian
+    pre_build_image: true
+
+provisioner:
+  name: ansible
+
+scenario:
+  create_sequence:
+    - create
+  check_sequence:
+    - destroy
+    - create
+    - converge
+    - check
+    - destroy
+  converge_sequence:
+    - create
+    - converge
+  destroy_sequence:
+    - destroy
+  test_sequence:
+    - lint
+    - destroy
+    - syntax
+    - create
+    - converge
+    - idempotence
+    - verify
+    - destroy
+
+verifier:
+  name: ansible

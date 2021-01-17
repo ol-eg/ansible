@@ -61,7 +61,7 @@
   debug:
     msg:
       - "Before it looks good"
-      - "Update fonst cache: $ sudo fc-cache"
+      - "Update fonts cache: $ sudo fc-cache"
       - "Choose nerd fonts in terminal preferences"
       - "Start vim and download all plugins"
       - ":PluginInstall"

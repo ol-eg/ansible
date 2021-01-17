@@ -1,0 +1,10 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include mail"
+      include_role:
+        name: "mail"
+      vars:
+        homedir_prefix: "/"
+        user: root
