@@ -1,0 +1,8 @@
+---
+- name: Install all tools.
+  apt:
+    name:
+      - "{{ item }}"
+    update_cache: yes
+  loop: "{{ tools }}"
+...

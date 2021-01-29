@@ -1,0 +1,16 @@
+---
+tools:
+  - apg
+  - apt-xapian-index
+  - aptitude
+  - binutils
+  - cowsay
+  - curl
+  - fortune
+  - net-tools
+  - nmap
+  - packagesearch
+  - pinfo
+  - synaptic
+  - tree
+...
