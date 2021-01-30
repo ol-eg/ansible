@@ -1,0 +1,28 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - include_vars: ../../defaults/main.yml
+
+    - name: Read installed packages list.
+      command: apt list --installed
+      register: installed
+      changed_when: no
+
+    - name: Verify apt-file is installed.
+      assert:
+        that: '"{{ package_name }}" in installed.stdout'
+
+    - name: Stat cron.weekly/apt-file.
+      stat:
+        path: /etc/cron.weekly/apt-file
+      register: apt_file
+
+    - name: Verify weekly updates has been scheduled.
+      assert:
+        that:
+          - apt_file.stat.pw_name == "root"
+          - apt_file.stat.gr_name == "root"
+          - apt_file.stat.mode == "0755"
+...

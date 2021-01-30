@@ -1,0 +1,15 @@
+#! /bin/bash
+
+set -e
+
+test -x /usr/bin/apt-file
+
+if which on_ac_power >/dev/null 2>&1; then
+    ON_BATTERY=0
+    on_ac_power >/dev/null 2>&1 || ON_BATTERY=$?
+    if [ "$ON_BATTERY" -eq 1 ]; then
+        exit 0
+    fi
+fi
+
+/usr/bin/apt-file update

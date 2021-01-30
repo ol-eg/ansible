@@ -1,0 +1,14 @@
+---
+- name: Install apt-file package.
+  apt:
+    name: "{{ package_name }}"
+    update_cache: yes
+
+- name: Schedule weekly apt-file updates.
+  copy:
+    src: cron.weekly
+    dest: /etc
+    group: root
+    owner: root
+    mode: '0755'
+...
