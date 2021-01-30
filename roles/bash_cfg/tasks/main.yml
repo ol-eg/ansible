@@ -1,9 +1,11 @@
 ---
-- name: Install shell source files.
-  template:
-    src: "{{ item }}.j2"
-    dest: "/etc/profile.d/{{ item }}.sh"
-    mode: 0644
+- name: Install shell startup files.
+  copy:
+    src: "{{ item[1] }}"
+    dest: "{{ homedir_prefix }}/{{ item[0] }}/.{{ item[1] }}"
+    group: "{{ item[0] }}"
+    owner: "{{ item[0] }}"
+    mode: '0644'
     backup: yes
-  loop: "{{ files2source }}"
+  loop: "{{ users | product(startups) | list }}"
 ...

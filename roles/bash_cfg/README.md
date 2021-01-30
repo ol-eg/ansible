@@ -1,7 +1,7 @@
 bash_cfg
 =========
 
-Convigure Bash shell startup globaly.
+Convigure Bash shell startup for users.
 
 Requirements
 ------------
@@ -11,7 +11,11 @@ Debian OS (buster).
 Role Variables
 --------------
 
-- ```files2source``` files to be install into /etc/profile.d/
+*defaults are in* ```./defaults/main.yml```
+
+- ```homedir_prefix``` default: /home
+- ```startups```       files to be install into each user $HOME
+- ```users```          list of users
 
 Example Playbook
 ----------------
@@ -19,7 +23,7 @@ Example Playbook
     - hosts: localhost
       become: yes
       roles:
-         - bash_cfg
+         - { role: bash_cfg, users: [mort, ansible] }
 
 To Test
 -------

@@ -1,0 +1,8 @@
+# Personal starups.
+# ssh-agent
+/usr/bin/ps -C ssh-agent -o euser | grep $USER &>/dev/null
+if [ $? == 1 ]
+then
+    eval $(ssh-agent)
+fi
+# Personal env vars.

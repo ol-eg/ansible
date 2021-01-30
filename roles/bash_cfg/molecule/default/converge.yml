@@ -5,3 +5,7 @@
     - name: "Include bash_cfg"
       include_role:
         name: "bash_cfg"
+      vars:
+        homedir_prefix: "/"
+        users:
+          - root

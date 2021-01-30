@@ -1,4 +1,10 @@
-files2source:
-  - 01_functions
-  - 02_aliases
-  - 03_startprogs
+homedir_prefix: /home
+startups:
+  - bash_aliases
+  - bash_login
+  - bash_profile
+  - bashrc
+  - profile
+users:
+  - mort
+  - ansible

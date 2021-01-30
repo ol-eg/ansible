@@ -7,18 +7,19 @@
 
   - name: Collect source files stats
     stat:
-      path: "/etc/profile.d/{{ item }}.sh"
+      path: "/{{ item[0] }}/.{{ item[1] }}"
     register: sourced
-    loop: "{{ files2source }}"
+    loop: "{{ ['root'] | product(startups) | list }}"
 
   - name: Verify source files have been installed
     assert:
-      that: |
-        sourced.results[{{ i }}].stat.path == "/etc/profile.d/{{ item }}.sh" and
-        sourced.results[{{ i }}].stat.mode == "0644" and
-        sourced.results[{{ i }}].stat.pw_name == "root" and
-        sourced.results[{{ i }}].stat.gr_name == "root" and
-        sourced.results[{{ i }}].stat.size > 0
-    loop: "{{ files2source }}"
+      that:
+        - sourced.results[{{ i }}].stat.path == "/{{ item[0] }}/.{{ item[1] }}"
+        - sourced.results[{{ i }}].stat.mode == "0644"
+        - sourced.results[{{ i }}].stat.pw_name == "{{ item[0] }}"
+        - sourced.results[{{ i }}].stat.gr_name == "{{ item[0] }}"
+        - sourced.results[{{ i }}].stat.size > 0
+    loop: "{{ ['root'] | product(startups) | list }}"
     loop_control:
       index_var: i
+...
