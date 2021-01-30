@@ -1,0 +1,21 @@
+---
+- name: Install cruft package.
+  apt:
+    name: "{{ package_name }}"
+    update_cache: yes
+
+- name: Schedule weekly runs.
+  copy:
+    src: cron.weekly
+    dest: /etc
+    group: root
+    owner: root
+    mode: '0755'
+
+- name: Note.
+  debug:
+    msg: |
+      Cruft has been schedule with no real config.
+      Exclude dirs in /etc/cron.weekly/cruft script
+      Create filters in /etc/cruft/filters/
+...

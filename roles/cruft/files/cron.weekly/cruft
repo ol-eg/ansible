@@ -1,0 +1,15 @@
+#! /bin/bash
+
+set -e
+
+test -x /usr/sbin/cruft
+
+if which on_ac_power >/dev/null 2>&1; then
+    ON_BATTERY=0
+    on_ac_power >/dev/null 2>&1 || ON_BATTERY=$?
+    if [ "$ON_BATTERY" -eq 1 ]; then
+        exit 0
+    fi
+fi
+
+/usr/sbin/cruft --ignore "/var/lib/containerd /var/lib/docker" -r /tmp/cruft-report.txt

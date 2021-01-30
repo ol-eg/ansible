@@ -3,6 +3,8 @@
 # For me the major benefit here is the documentation as code.
 # This is meant to be played straight after manual OS install,
 # while host is still hooked up to the internet with the wire.
+# Play wifi_firmware and wife separately as firmware install
+# will need reboot.
 - hosts: localhost
   become: yes
   roles:
@@ -19,3 +21,4 @@
     - dropbox
     - tor
     - apt_file
+    - cruft
