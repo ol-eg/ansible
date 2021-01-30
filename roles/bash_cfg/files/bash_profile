@@ -6,3 +6,6 @@ then
     eval $(ssh-agent)
 fi
 # Personal env vars.
+if [ -f ~/.bashrc ]; then
+    source ~/.bashrc
+fi

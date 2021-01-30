@@ -1,0 +1,27 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - include_vars: ../../defaults/main.yml
+
+    - name: Read installed packages list.
+      command: apt list --installed
+      register: installed
+      changed_when: no
+
+    - name: Verify Tor is installed.
+      assert:
+        that: '"{{ tor }}" in installed.stdout'
+
+    - name: Read root's bash_aliases.
+      command: "cat /root/.bash_aliases"
+      register: aliases
+      changed_when: no
+
+    - name: Verify root has got tor cmd aliases.
+      assert:
+        that:
+          - '"{{ item }}" in aliases.stdout'
+      loop: "{{ tor_aliases }}"
+...

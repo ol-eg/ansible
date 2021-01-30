@@ -1,0 +1,12 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include tor"
+      include_role:
+        name: "tor"
+      vars:
+        homedir_prefix: "/"
+        users:
+          - root
+...

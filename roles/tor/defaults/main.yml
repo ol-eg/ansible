@@ -1,0 +1,10 @@
+---
+tor_aliases:
+  - "alias tor='torbrowser-launcher'"
+  - "alias setor='torbrowser-launcher --settings'"
+backports: "deb http://deb.debian.org/debian buster-backports main contrib non-free"
+homedir_prefix: /home
+tor: torbrowser-launcher
+users:
+  - mort
+...
