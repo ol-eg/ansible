@@ -1,5 +1,6 @@
 ---
 tools:
+  - apt-listbugs
   - apg
   - apt-xapian-index
   - aptitude
@@ -10,8 +11,6 @@ tools:
   - mlocate
   - net-tools
   - nmap
-  - packagesearch
   - pinfo
-  - synaptic
   - tree
 ...
