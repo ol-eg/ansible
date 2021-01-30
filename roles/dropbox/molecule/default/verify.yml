@@ -1,0 +1,23 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - include_vars: ../../defaults/main.yml
+
+    - name: Read installed packages list.
+      command: apt list --installed
+      register: installed
+      changed_when: false
+
+    - name: Verify prereqisites are installed.
+      assert:
+        that: '"{{ item }}" in installed.stdout'
+      loop: "{{ prerequisites }}"
+
+    - name: Verify dropbox GUI installer has been installed.
+      vars:
+        search: dropbox
+      assert:
+        that: '"{{ search }}" in installed.stdout'
+...

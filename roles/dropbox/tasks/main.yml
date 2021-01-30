@@ -1,0 +1,22 @@
+---
+- name: Install prerequisites.
+  apt:
+    name:
+      - "{{ item }}"
+    update_cache: yes
+  loop: "{{ prerequisites }}"
+
+- name: Download dropbox GUI installer.
+  get_url:
+    url: "{{ dropbox_deb_url }}"
+    dest: /tmp
+    mode: '0440'
+
+- name: Install dropbox GUI installer.
+  apt:
+    deb: "/tmp/{{ deb_name }}"
+
+- name: Install dropbox using GUI.
+  debug:
+    msg: Reboot and finish the isntall using dropbox GUI installer.
+...
