@@ -1,7 +1,7 @@
 deb_contrib_nonfree_repos:
-  - "deb https://deb.debian.org/debian/ buster"
-  - "deb-src https://deb.debian.org/debian/ buster"
-  - "deb https://deb.debian.org/debian/ buster-updates"
-  - "deb-src https://deb.debian.org/debian/ buster-updates"
-  - "deb http://security.debian.org/debian-security buster/updates"
-  - "deb-src http://security.debian.org/debian-security buster/updates"
+  - "deb https://deb.debian.org/debian/ bullseye"
+  - "deb-src https://deb.debian.org/debian/ bullseye"
+  - "deb https://deb.debian.org/debian/ bullseye-updates"
+  - "deb-src https://deb.debian.org/debian/ bullseye-updates"
+  - "deb http://security.debian.org/debian-security bullseye/updates"
+  - "deb-src http://security.debian.org/debian-security bullseye/updates"

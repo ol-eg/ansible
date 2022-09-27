@@ -1,26 +1,29 @@
 # ansible
 
-## Install (debian host assumed).
+## Install (debian 11 host assumed).
 *create ansible user, add it to the sudo group and make sudo passwordless*
 ```bash
 # adduser ansible
 # usermod -a -G sudo ansible
 # echo 'ansible ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ansible
+# apt install pipenv
 ```
+*logout -> login for sudo group to propogate*
 ```bash
-$ sudo apt install python3-venv python3-virtualenv git
 $ sudo su - ansible
-$ mkdir -v ~/.virtualenvs
-$ python3 -m venv ~/.virtualenvs/ansible
-$ source ~/.virtualenvs/ansible/bin/activate
-(ansible) $ pip install --upgrade pip setuptools wheel
-(ansible) $ pip install ansible
+$ pipenv --python 3.9
+$ pipenv shell --fancy
+$ pipenv run install --upgrade pip setuptools wheel
+$ pipenv install ansible
 ```
 ### Install collection from this repo.
 
-ssh public key needs to be uploaded to git hub via web-frontend (settings -> SSH and GPG keys)
+*ssh public key needs to be uploaded to git hub via web-frontend (settings -> SSH and GPG keys)*
 
-```(ansible) $ ansible-galaxy collection install git@github.com:ol-eg/ansible.git```
+```
+$ sudo apt install git
+$ ansible-galaxy collection install git@github.com:ol-eg/ansible.git
+```
 
 ### Play examples.
 
@@ -28,5 +31,5 @@ ssh public key needs to be uploaded to git hub via web-frontend (settings -> SSH
 $ ln -v ~/.ansible/collections/ansible_collections/oppa/all/ansible.cfg ~/ansible.cfg
 $ ln -v ~/.ansible/collections/ansible_collections/oppa/all/hosts ~/hosts
 # provision new laptop after freshly instatlled debian
-(ansible) $ ansible-playbook ~/ansible/playbooks/debian-laptop.yaml
+$ ansible-playbook ~/ansible/playbooks/debian-laptop.yaml
 ```
