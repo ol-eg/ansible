@@ -3,7 +3,7 @@ name: "all"
 version: "0.0.1"
 readme: "README.md"
 authors:
-    - "oleg <o-le-g@inbox.ru"
+    - "oleg <2oleg.t@gmail.com"
 description: "Collection of roles and modules to provision physical machines."
 license:
     - "MIT"

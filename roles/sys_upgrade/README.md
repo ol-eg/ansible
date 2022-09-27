@@ -25,7 +25,7 @@ To Test
 -------
 *requires docker, ansible, molecule[docker,lint]*
 
-```(ansible) $ mol test```
+```$ mol test```
 
 License
 -------
@@ -35,4 +35,4 @@ MIT
 Author Information
 ------------------
 
-o-le-g@inbox.ru
+2oleg.t@gmail.com

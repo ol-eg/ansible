@@ -50,4 +50,4 @@ MIT
 Author Information
 ------------------
 
-o-le-g@inbox.ru
+2oleg.t@gmail.com
